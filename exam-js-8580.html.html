@@ -1,0 +1,128 @@
+<table border="1">
+    <input type="hidden" id="editno">
+    <tr>
+        <td>Fruit Name :</td>
+        <td><input type="text" id="fruitName"></td>
+    </tr>
+    <tr>
+        <td>Quantity :</td>
+        <td><input type="text" id="quantity"></td>
+    </tr>
+    <tr>
+        <td>Price :</td>
+        <td><input type="text" id="price"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><input type="button" id="submit" value="Submit Product" onclick="AddData()"></td>
+    </tr>
+</table>
+
+<div id="res"></div>
+
+<script>
+    var products = [
+        {
+            fruitName: "Apple",
+            quantity: 10,
+            price: 2.5,
+            no: Math.round(Math.random() * 100)
+        },
+        {
+            fruitName: "Banana",
+            quantity: 20,
+            price: 1.2,
+            no: Math.round(Math.random() * 100)
+        }
+    ];
+
+    function AddData() {
+        var fruitName = document.getElementById('fruitName').value;
+        var quantity = document.getElementById('quantity').value;
+        var price = document.getElementById('price').value;
+        var editno = document.getElementById('editno').value;
+
+        if (editno) {
+            for (var i = 0; i < products.length; i++) {
+                if (products[i]['no'] == editno) {
+                    products[i]['fruitName'] = fruitName;
+                    products[i]['quantity'] = quantity;
+                    products[i]['price'] = price;
+                    document.getElementById('editno').value = "";
+                    document.getElementById('submit').value = "Submit Product";
+                    break;
+                }
+            }
+        } else {
+            var product = {
+                fruitName: fruitName,
+                quantity: quantity,
+                price: price,
+                no: Math.round(Math.random() * 100)
+            };
+            products.push(product);
+        }
+
+        localStorage.setItem('products', JSON.stringify(products));
+
+        document.getElementById('fruitName').value = "";
+        document.getElementById('quantity').value = "";
+        document.getElementById('price').value = "";
+
+        ViewData();
+    }
+
+    function ViewData() {
+        var dataFromStorage = localStorage.getItem('products');
+        var view = JSON.parse(dataFromStorage);
+
+        var data = "<table border='1'><tr><th>Fruit Name</th><th>Quantity</th><th>Price</th><th>Delete</th><th>Update</th></tr>";
+
+        for (var i = 0; i < view.length; i++) {
+            data += `<tr>`;
+            data += `<td>${view[i]['fruitName']}</td>`;
+            data += `<td>${view[i]['quantity']}</td>`;
+            data += `<td>${view[i]['price']}</td>`;
+            data += `<td><a href='javascript:DeleteData(${view[i]['no']})'>Delete</a></td>`;
+            data += `<td><a href='javascript:UpdateData(${view[i]['no']})'>Update</a></td>`;
+            data += `</tr>`;
+        }
+
+        data += "</table>";
+        document.getElementById('res').innerHTML = data;
+    }
+
+    function DeleteData(no) {
+        var DeleteD = localStorage.getItem('products');
+        var delet = JSON.parse(DeleteD);
+
+        for (var i = 0; i < delet.length; i++) {
+            if (delet[i]['no'] == no) {
+                delet.splice(i, 1);
+                break;
+            }
+        }
+
+        localStorage.setItem('products', JSON.stringify(delet));
+        ViewData();
+    }
+
+    function UpdateData(no) {
+        var up = localStorage.getItem('products');
+        var update = JSON.parse(up);
+
+        for (var i = 0; i < update.length; i++) {
+            if (update[i]['no'] == no) {
+                document.getElementById('fruitName').value = update[i]['fruitName'];
+                document.getElementById('quantity').value = update[i]['quantity'];
+                document.getElementById('price').value = update[i]['price'];
+                document.getElementById('editno').value = no;
+                document.getElementById('submit').value = "Update Product";
+                break;
+            }
+        }
+    }
+
+
+    ViewData();
+</script>
